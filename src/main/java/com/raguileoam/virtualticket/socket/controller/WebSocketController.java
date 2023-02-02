@@ -24,9 +24,7 @@ public class WebSocketController {
 		this.modelInfoHolder = modelInfoHolder;
 	}
 
-	// @Scheduled(fixedDelay = 5000)
 	@MessageMapping("/welcome")
-	// @SendTo("/info/values") //Alternative to messageTemplate.convertAndSend
 	public void sendWebSocketUpdate() throws JsonProcessingException {
 		modelInfoHolder.changeValues();
 		this.messageTemplate.convertAndSend(destinationUrl,

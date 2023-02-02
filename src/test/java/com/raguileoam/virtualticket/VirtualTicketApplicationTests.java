@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -34,7 +32,6 @@ import com.raguileoam.virtualticket.controller.TicketController;
 import com.raguileoam.virtualticket.model.Office;
 import com.raguileoam.virtualticket.model.Ticket;
 import com.raguileoam.virtualticket.repositories.OfficeRepository;
-import com.raguileoam.virtualticket.socket.model.TicketModelInfo;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class VirtualTicketApplicationTests {
@@ -58,7 +55,6 @@ class VirtualTicketApplicationTests {
 	void setup() {
 		List<Transport> webSocketTransportList = List.of(new WebSocketTransport(new StandardWebSocketClient()));
 		this.webSocketStompClient = new WebSocketStompClient(new SockJsClient(webSocketTransportList));
-		// this.webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 		this.webSocketStompClient.setMessageConverter(new StringMessageConverter());
 	}
 
