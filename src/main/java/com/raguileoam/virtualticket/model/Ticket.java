@@ -5,6 +5,8 @@ import lombok.*;
 import java.time.Instant;
 import java.util.Date;
 
+import com.raguileoam.virtualticket.security.model.Account;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +20,6 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 public class Ticket {
     @Id
     @Setter(AccessLevel.PROTECTED)
@@ -35,8 +36,16 @@ public class Ticket {
 
     private String attentionId;
 
-    public Ticket(Office office) {
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    private Account account; 
+
+    public Ticket() {
+        this.date = Date.from(Instant.now());
+    }
+    public Ticket(Office office, Account account) {
         this.office = office;
+        this.account = account;
         this.date = Date.from(Instant.now());
     }
 }

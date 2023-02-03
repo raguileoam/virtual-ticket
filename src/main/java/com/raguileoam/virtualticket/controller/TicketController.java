@@ -1,19 +1,23 @@
 package com.raguileoam.virtualticket.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.raguileoam.virtualticket.model.Office;
 import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.model.TicketNotFoundException;
-import com.raguileoam.virtualticket.model.TicketState;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
-import com.raguileoam.virtualticket.repositories.TicketRepository;
+import com.raguileoam.virtualticket.service.TicketService;
 import com.raguileoam.virtualticket.socket.controller.WebSocketController;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -21,77 +25,62 @@ import java.util.List;
 public class TicketController {
 
     @Autowired
-    TicketRepository ticketRepository;
-
-    @Autowired
-    OfficeRepository officeRepository;
+    TicketService ticketService;
 
     @Autowired
     WebSocketController webSocketController;
 
     @GetMapping("/")
-    public List<Ticket> findAll() {
-        return ticketRepository.findAll();
+	@PreAuthorize("hasRole('ADMIN')")
+    public List<Ticket> findAll(){
+        return ticketService.findAll();
     }
 
-    // @GetMapping("/user/{id}")
-    // public List<Ticket> findAllByUser(@PathVariable Long id) {
-    // return ticketRepository.findByUserId(id);
-    // }
+    @GetMapping("/user/{id}")
+    @PreAuthorize("#id == authentication.principal.id")
+    public List<Ticket> findAllByUser(@PathVariable Long id) {
+        return ticketService.findAllByUser(id);
+    }
 
     @GetMapping("/office/{id}")
-    public List<Ticket> findAllByOffice(@PathVariable Long id) {
-        return ticketRepository.findByOfficeId(id);
+    @PreAuthorize("hasRole('MODERATOR')")
+    public List<Ticket> findAllByOffice(@PathVariable Long id){
+        return ticketService.findAllByOffice(id);
     }
 
     @PostMapping("/")
-    public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException {
-        Office office1 = officeRepository.findById(ticket.getOffice().getId()).map(office -> {
-            office.setTicketsTotal(office.getTicketsTotal() + 1);
-            return officeRepository.save(office);
-        }).orElse(ticket.getOffice());
-        ticket.setOffice(office1);
-        ticket.setAttentionId(String.format("A%d", office1.getTicketsTotal()));
-        Ticket ticket2 = ticketRepository.save(ticket);
+	@PreAuthorize("hasRole('USER')")
+    public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException{
+        ticket = ticketService.saveTicket(ticket);
         webSocketController.sendWebSocketUpdate();
-        ;
-        return ticket2;
+        return ticket;
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Ticket getTicketById(@PathVariable Long id) {
-        return ticketRepository.findById(id).orElseThrow(() -> new TicketNotFoundException(id));
+        return ticketService.getTicketById(id);
     }
-
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteTicketById(@PathVariable Long id) {
-        ticketRepository.deleteById(id);
+        ticketService.deleteTicketById(id);
     }
 
     @PutMapping("{id}/mark-as-late")
+    @PreAuthorize("hasRole('USER')")
     public Ticket markAsLate(@PathVariable Long id) {
-        return ticketRepository.findById(id)
-                .map(ticket -> {
-                    ticket.setStatus(TicketState.LATE);
-                    return ticketRepository.save(ticket);
-                }).orElseThrow(() -> new TicketNotFoundException(id));
+        return ticketService.markAsLate(id);
     }
 
     @PutMapping("{id}/mark-as-done")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public Ticket markAsDone(@PathVariable Long id) {
-        return ticketRepository.findById(id)
-                .map(ticket -> {
-                    ticket.setStatus(TicketState.DONE);
-                    return ticketRepository.save(ticket);
-                }).orElseThrow(() -> new TicketNotFoundException(id));
+        return ticketService.markAsDone(id);
     }
-
     @PutMapping("{id}/mark-as-cancelled")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public Ticket markAsCancelled(@PathVariable Long id) {
-        return ticketRepository.findById(id)
-                .map(ticket -> {
-                    ticket.setStatus(TicketState.CANCELLED);
-                    return ticketRepository.save(ticket);
-                }).orElseThrow(() -> new TicketNotFoundException(id));
+        return ticketService.markAsCancelled(id);
     }
 }

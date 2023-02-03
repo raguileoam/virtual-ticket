@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -28,19 +27,24 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
-import com.raguileoam.virtualticket.controller.TicketController;
 import com.raguileoam.virtualticket.model.Office;
 import com.raguileoam.virtualticket.model.Ticket;
 import com.raguileoam.virtualticket.repositories.OfficeRepository;
+import com.raguileoam.virtualticket.security.model.Account;
+import com.raguileoam.virtualticket.security.repository.AccountRepository;
+import com.raguileoam.virtualticket.service.TicketService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class VirtualTicketApplicationTests {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class SocketTest {
 
 	@Autowired
-	private TicketController ticketController;
+	private TicketService ticketController;
 
 	@Autowired
 	private OfficeRepository officeRepository;
+
+	@Autowired
+	private AccountRepository accountRepository;
 
 	private WebSocketStompClient webSocketStompClient;
 
@@ -48,7 +52,7 @@ class VirtualTicketApplicationTests {
 	private Integer port;
 
 	private final String subscriptionUrl = "/info/values";
-	
+
 	private final String socketEndpoint = "data-info";
 
 	@BeforeEach
@@ -56,6 +60,7 @@ class VirtualTicketApplicationTests {
 		List<Transport> webSocketTransportList = List.of(new WebSocketTransport(new StandardWebSocketClient()));
 		this.webSocketStompClient = new WebSocketStompClient(new SockJsClient(webSocketTransportList));
 		this.webSocketStompClient.setMessageConverter(new StringMessageConverter());
+
 	}
 
 	@Test
@@ -64,13 +69,13 @@ class VirtualTicketApplicationTests {
 		this.webSocketStompClient
 				.connectAsync(getWsPath(), new CustomStompFrameHandler(completableFuture))
 				.get(1, TimeUnit.SECONDS);
-		Ticket ticket = new Ticket();
 		Office office = officeRepository.findById(1L).get();
-		ticket.setOffice(office);
+		Account account = accountRepository.findById(1L).get();
+		Ticket ticket = new Ticket(office, account);
 		ticket = ticketController.saveTicket(ticket);
 		assertEquals(1L, office.getId());
 		assertEquals(1L, ticket.getOffice().getId());
-		String ticketInfoResponse = completableFuture.get(10, TimeUnit.SECONDS);
+		String ticketInfoResponse = completableFuture.get(3, TimeUnit.SECONDS);
 		assertNotNull(ticketInfoResponse);
 	}
 
