@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.model;
+package com.raguileoam.virtualticket.domain.model;
 
 import lombok.*;
 
@@ -38,11 +38,12 @@ public class Ticket {
 
     @OneToOne
     @JoinColumn(name = "account_id")
-    private Account account; 
+    private Account account;
 
     public Ticket() {
         this.date = Date.from(Instant.now());
     }
+
     public Ticket(Office office, Account account) {
         this.office = office;
         this.account = account;

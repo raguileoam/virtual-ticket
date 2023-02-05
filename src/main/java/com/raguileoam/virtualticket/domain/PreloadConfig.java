@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket;
+package com.raguileoam.virtualticket.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,8 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.raguileoam.virtualticket.model.Office;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
+import com.raguileoam.virtualticket.domain.model.Office;
+import com.raguileoam.virtualticket.domain.repository.OfficeRepository;
 import com.raguileoam.virtualticket.security.SecurityConfig;
 import com.raguileoam.virtualticket.security.model.Account;
 import com.raguileoam.virtualticket.security.model.ERole;

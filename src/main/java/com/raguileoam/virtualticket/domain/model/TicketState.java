@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.model;
+package com.raguileoam.virtualticket.domain.model;
 
 public enum TicketState {
     ACTIVE, LATE, LAPSED, CANCELLED, DONE

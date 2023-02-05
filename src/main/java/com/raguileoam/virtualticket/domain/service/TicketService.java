@@ -1,16 +1,16 @@
-package com.raguileoam.virtualticket.service;
+package com.raguileoam.virtualticket.domain.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.raguileoam.virtualticket.model.Office;
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.model.TicketNotFoundException;
-import com.raguileoam.virtualticket.model.TicketState;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
-import com.raguileoam.virtualticket.repositories.TicketRepository;
+import com.raguileoam.virtualticket.domain.model.Office;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.model.TicketNotFoundException;
+import com.raguileoam.virtualticket.domain.model.TicketState;
+import com.raguileoam.virtualticket.domain.repository.OfficeRepository;
+import com.raguileoam.virtualticket.domain.repository.TicketRepository;
 
 @Service
 public class TicketService {

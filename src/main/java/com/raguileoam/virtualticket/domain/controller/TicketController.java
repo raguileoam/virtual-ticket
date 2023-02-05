@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.controller;
+package com.raguileoam.virtualticket.domain.controller;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.service.TicketService;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.service.TicketService;
 import com.raguileoam.virtualticket.socket.controller.WebSocketController;
 
 @RestController
@@ -31,8 +31,8 @@ public class TicketController {
     WebSocketController webSocketController;
 
     @GetMapping("/")
-	@PreAuthorize("hasRole('ADMIN')")
-    public List<Ticket> findAll(){
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Ticket> findAll() {
         return ticketService.findAll();
     }
 
@@ -44,13 +44,13 @@ public class TicketController {
 
     @GetMapping("/office/{id}")
     @PreAuthorize("hasRole('MODERATOR')")
-    public List<Ticket> findAllByOffice(@PathVariable Long id){
+    public List<Ticket> findAllByOffice(@PathVariable Long id) {
         return ticketService.findAllByOffice(id);
     }
 
     @PostMapping("/")
-	@PreAuthorize("hasRole('USER')")
-    public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException{
+    @PreAuthorize("hasRole('USER')")
+    public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException {
         ticket = ticketService.saveTicket(ticket);
         webSocketController.sendWebSocketUpdate();
         return ticket;
@@ -61,6 +61,7 @@ public class TicketController {
     public Ticket getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id);
     }
+
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteTicketById(@PathVariable Long id) {
@@ -78,6 +79,7 @@ public class TicketController {
     public Ticket markAsDone(@PathVariable Long id) {
         return ticketService.markAsDone(id);
     }
+
     @PutMapping("{id}/mark-as-cancelled")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public Ticket markAsCancelled(@PathVariable Long id) {

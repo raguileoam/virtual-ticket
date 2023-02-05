@@ -27,12 +27,12 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
-import com.raguileoam.virtualticket.model.Office;
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
+import com.raguileoam.virtualticket.domain.model.Office;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.repository.OfficeRepository;
+import com.raguileoam.virtualticket.domain.service.TicketService;
 import com.raguileoam.virtualticket.security.model.Account;
 import com.raguileoam.virtualticket.security.repository.AccountRepository;
-import com.raguileoam.virtualticket.service.TicketService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SocketTest {

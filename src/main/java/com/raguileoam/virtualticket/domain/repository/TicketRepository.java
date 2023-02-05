@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.repositories;
+package com.raguileoam.virtualticket.domain.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.model.TicketState;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.model.TicketState;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {

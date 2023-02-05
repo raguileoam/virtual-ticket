@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
-import com.raguileoam.virtualticket.model.Office;
+import com.raguileoam.virtualticket.domain.model.Office;
 
 @Getter
 public class TicketModelInfo implements Serializable {
@@ -13,7 +13,7 @@ public class TicketModelInfo implements Serializable {
 	private String lastTicketInProcess;
 
 	private String lastTicketInAttention;
-	
+
 	private Office office;
 
 	public TicketModelInfo(Office office) {

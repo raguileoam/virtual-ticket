@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.model;
+package com.raguileoam.virtualticket.domain.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

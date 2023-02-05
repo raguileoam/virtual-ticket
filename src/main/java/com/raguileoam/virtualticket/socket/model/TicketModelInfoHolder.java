@@ -5,11 +5,11 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.raguileoam.virtualticket.model.Office;
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.model.TicketState;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
-import com.raguileoam.virtualticket.repositories.TicketRepository;
+import com.raguileoam.virtualticket.domain.model.Office;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.model.TicketState;
+import com.raguileoam.virtualticket.domain.repository.OfficeRepository;
+import com.raguileoam.virtualticket.domain.repository.TicketRepository;
 
 @Component
 public class TicketModelInfoHolder {

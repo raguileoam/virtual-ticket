@@ -1,4 +1,4 @@
-package com.raguileoam.virtualticket.model;
+package com.raguileoam.virtualticket.domain.model;
 
 public class TicketNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;

@@ -13,14 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import com.raguileoam.virtualticket.model.Office;
-import com.raguileoam.virtualticket.model.Ticket;
-import com.raguileoam.virtualticket.model.TicketState;
-import com.raguileoam.virtualticket.repositories.OfficeRepository;
-import com.raguileoam.virtualticket.repositories.TicketRepository;
+import com.raguileoam.virtualticket.domain.model.Office;
+import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.model.TicketState;
+import com.raguileoam.virtualticket.domain.repository.OfficeRepository;
+import com.raguileoam.virtualticket.domain.repository.TicketRepository;
+import com.raguileoam.virtualticket.domain.service.TicketService;
 import com.raguileoam.virtualticket.security.model.Account;
 import com.raguileoam.virtualticket.security.repository.AccountRepository;
-import com.raguileoam.virtualticket.service.TicketService;
 
 @SpringBootTest
 public class TicketServiceTest {
