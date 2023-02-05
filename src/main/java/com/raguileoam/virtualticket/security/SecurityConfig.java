@@ -99,7 +99,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/**", "/data-info/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/data-info/**").permitAll()
                 .anyRequest().authenticated().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
