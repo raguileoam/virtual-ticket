@@ -15,7 +15,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Optional<Ticket> findTop1ByOfficeIdAndStatusOrderByIdAsc(Long id, TicketState status);
 
-    List<Ticket> findByAccountId(Long id);
+    List<Ticket> findByAccountUsername(String username);
 
     List<Ticket> findByOfficeId(Long id);
 }

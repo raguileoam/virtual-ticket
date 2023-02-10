@@ -79,9 +79,9 @@ public class TicketServiceTest {
     void testFindAllByUser() {
         Ticket ticket = new Ticket(this.office, this.account);
         ticket = ticketService.saveTicket(ticket);
-        List<Ticket> tickets = ticketService.findAllByUser(this.account.getId());
+        List<Ticket> tickets = ticketService.findAllByUsername(this.account.getUsername());
         assertEquals(1, tickets.size());
-        List<Ticket> tickets2 = ticketService.findAllByUser(10L);
+        List<Ticket> tickets2 = ticketService.findAllByUsername("null");
         assertEquals(0, tickets2.size());
 
     }
@@ -114,15 +114,6 @@ public class TicketServiceTest {
         Ticket ticket2 = ticketService.markAsDone(ticket.getId());
         assertNotEquals(ticket.getStatus().name(), ticket2.getStatus().name());
         assertEquals(TicketState.DONE, ticket2.getStatus());
-    }
-
-    @Test
-    void testMarkAsLate() {
-        Ticket ticket = new Ticket(this.office, this.account);
-        ticket = ticketService.saveTicket(ticket);
-        Ticket ticket2 = ticketService.markAsLate(ticket.getId());
-        assertNotEquals(ticket.getStatus().name(), ticket2.getStatus().name());
-        assertEquals(TicketState.LATE, ticket2.getStatus());
     }
 
     @Test

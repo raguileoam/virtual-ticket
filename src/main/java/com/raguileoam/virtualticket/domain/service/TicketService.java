@@ -24,8 +24,8 @@ public class TicketService {
         return ticketRepository.findAll();
     }
 
-    public List<Ticket> findAllByUser(Long id) {
-        return ticketRepository.findByAccountId(id);
+    public List<Ticket> findAllByUsername(String username) {
+        return ticketRepository.findByAccountUsername(username);
     }
 
     public List<Ticket> findAllByOffice(Long id) {
@@ -48,14 +48,6 @@ public class TicketService {
 
     public void deleteTicketById(Long id) {
         ticketRepository.deleteById(id);
-    }
-
-    public Ticket markAsLate(Long id) {
-        return ticketRepository.findById(id)
-                .map(ticket -> {
-                    ticket.setStatus(TicketState.LATE);
-                    return ticketRepository.save(ticket);
-                }).orElseThrow(() -> new TicketNotFoundException(id));
     }
 
     public Ticket markAsDone(Long id) {

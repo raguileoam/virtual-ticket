@@ -41,7 +41,7 @@ public class PreloadConfig {
             SecurityConfig securityConfig = new SecurityConfig();
             String password = securityConfig.encryptPassword(userPassword);
             Account account = new Account("user", userEmail, password);
-            account.setRol(ERole.ADMIN);
+            account.setRol(ERole.ROLE_ADMIN);
             accountRepository.save(account);
         });
     }

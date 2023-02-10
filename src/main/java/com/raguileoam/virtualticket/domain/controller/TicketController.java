@@ -1,11 +1,15 @@
 package com.raguileoam.virtualticket.domain.controller;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.raguileoam.virtualticket.domain.model.Ticket;
 import com.raguileoam.virtualticket.domain.service.TicketService;
+import com.raguileoam.virtualticket.security.repository.AccountRepository;
 import com.raguileoam.virtualticket.socket.controller.WebSocketController;
 
 @RestController
@@ -30,26 +35,23 @@ public class TicketController {
     @Autowired
     WebSocketController webSocketController;
 
-    @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<Ticket> findAll() {
-        return ticketService.findAll();
-    }
+    @Autowired
+    AccountRepository accountRepository;
 
-    @GetMapping("/user/{id}")
-    @PreAuthorize("#id == authentication.principal.id")
-    public List<Ticket> findAllByUser(@PathVariable Long id) {
-        return ticketService.findAllByUser(id);
+    @GetMapping("/user/{username}")
+    @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    public List<Ticket> findAllTicketsByUser(@PathVariable String username) {
+        return ticketService.findAllByUsername(username);
     }
 
     @GetMapping("/office/{id}")
-    @PreAuthorize("hasRole('MODERATOR')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public List<Ticket> findAllByOffice(@PathVariable Long id) {
         return ticketService.findAllByOffice(id);
     }
 
     @PostMapping("/")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException {
         ticket = ticketService.saveTicket(ticket);
         webSocketController.sendWebSocketUpdate();
@@ -57,31 +59,30 @@ public class TicketController {
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public Ticket getTicketById(@PathVariable Long id) {
-        return ticketService.getTicketById(id);
-    }
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails)
+            throws AccessDeniedException {
+        try {
+            Ticket ticket = ticketService.getTicketById(id);
+            if (ticket.getAccount().getEmail() != userDetails.getUsername()) {
+                throw new AccessDeniedException("null");
+            }
+            return new ResponseEntity<Ticket>(ticket, HttpStatus.OK);
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        }
+        return new ResponseEntity<Ticket>(HttpStatus.NOT_FOUND);
 
-    @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deleteTicketById(@PathVariable Long id) {
-        ticketService.deleteTicketById(id);
-    }
-
-    @PutMapping("{id}/mark-as-late")
-    @PreAuthorize("hasRole('USER')")
-    public Ticket markAsLate(@PathVariable Long id) {
-        return ticketService.markAsLate(id);
     }
 
     @PutMapping("{id}/mark-as-done")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public Ticket markAsDone(@PathVariable Long id) {
         return ticketService.markAsDone(id);
     }
 
     @PutMapping("{id}/mark-as-cancelled")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public Ticket markAsCancelled(@PathVariable Long id) {
         return ticketService.markAsCancelled(id);
     }
