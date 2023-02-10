@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.raguileoam.virtualticket.security.model.Account;
 import com.raguileoam.virtualticket.security.repository.AccountRepository;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        com.raguileoam.virtualticket.security.model.Account user = accountRepository.findByEmail(s);
+        Account user = accountRepository.findByEmail(s);
 
         if (user == null)
             throw new UsernameNotFoundException("Usuario no encontrado");
@@ -59,7 +60,7 @@ public class JpaUserDetailsService implements UserDetailsService {
      *                Usuario.
      * @return Authorities of this user.
      */
-    private List<GrantedAuthority> getAuthorities(com.raguileoam.virtualticket.security.model.Account account) {
+    private List<GrantedAuthority> getAuthorities(Account account) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(account.getRol().name()));
         return authorities;
