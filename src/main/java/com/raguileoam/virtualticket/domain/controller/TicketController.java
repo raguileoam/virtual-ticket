@@ -1,13 +1,14 @@
 package com.raguileoam.virtualticket.domain.controller;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.raguileoam.virtualticket.domain.model.Ticket;
+import com.raguileoam.virtualticket.domain.model.TicketNotFoundException;
 import com.raguileoam.virtualticket.domain.service.TicketService;
+import com.raguileoam.virtualticket.security.model.ERole;
 import com.raguileoam.virtualticket.security.repository.AccountRepository;
 import com.raguileoam.virtualticket.socket.controller.WebSocketController;
 
@@ -52,38 +55,73 @@ public class TicketController {
 
     @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public Ticket saveTicket(@RequestBody Ticket ticket) throws JsonProcessingException {
+    public Ticket saveTicket(@RequestBody Ticket ticket) {
         ticket = ticketService.saveTicket(ticket);
-        webSocketController.sendWebSocketUpdate();
+        try {
+            webSocketController.sendWebSocketUpdate();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return ticket;
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails)
-            throws AccessDeniedException {
+    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
             Ticket ticket = ticketService.getTicketById(id);
-            if (ticket.getAccount().getEmail() != userDetails.getUsername()) {
-                throw new AccessDeniedException("null");
+            if (userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals(ERole.ROLE_USER.name()))
+                    && !ticket.getAccount().getUsername().equals(userDetails.getUsername())) {
+                throw new AccessDeniedException("El usuario no puede tener acceso a información de otro usuario");
             }
             return new ResponseEntity<Ticket>(ticket, HttpStatus.OK);
-        } catch (Exception e) {
-            e.fillInStackTrace();
+        } catch (TicketNotFoundException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<Ticket>(HttpStatus.NOT_FOUND);
-
     }
 
     @PutMapping("{id}/mark-as-done")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public Ticket markAsDone(@PathVariable Long id) {
-        return ticketService.markAsDone(id);
+    public ResponseEntity<Ticket> markAsDone(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        try {
+            Ticket ticket = ticketService.markAsDone(id);
+            if (userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals(ERole.ROLE_USER.name()))
+                    && !ticket.getAccount().getUsername().equals(userDetails.getUsername())) {
+                throw new AccessDeniedException("El usuario no puede tener acceso a información de otro usuario");
+            }
+            return new ResponseEntity<Ticket>(ticket, HttpStatus.OK);
+        } catch (TicketNotFoundException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PutMapping("{id}/mark-as-cancelled")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public Ticket markAsCancelled(@PathVariable Long id) {
-        return ticketService.markAsCancelled(id);
+    public ResponseEntity<Ticket> markAsCancelled(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        try {
+            Ticket ticket = ticketService.markAsCancelled(id);
+            if (userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals(ERole.ROLE_USER.name()))
+                    && !ticket.getAccount().getUsername().equals(userDetails.getUsername())) {
+                throw new AccessDeniedException("El usuario no puede tener acceso a información de otro usuario");
+            }
+            return new ResponseEntity<Ticket>(ticket, HttpStatus.OK);
+        } catch (TicketNotFoundException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<Ticket>(HttpStatus.FORBIDDEN);
+        }
     }
 }
