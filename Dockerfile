@@ -6,7 +6,7 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
-RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
+RUN ./mvnw install -DskipTests
 
 RUN cp target/*.jar target/application.jar
 RUN java -Djarmode=layertools -jar target/application.jar extract --destination target/extracted
